@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import "./App.css";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { Box, Spinner, Text } from "@chakra-ui/react";
+import { Box, Divider, Spinner, Text } from "@chakra-ui/react";
 
 dayjs.extend(utc);
 
@@ -97,40 +97,46 @@ function App() {
             {schedule.season} Season
           </Text>
           {schedule.Races.map((race, index) => (
-            <Box
-              key={race.round as React.Key}
-              borderRadius='2xl'
-              backgroundColor='white'
-              marginBottom='4'
-              display='flex'
-              flexDirection='row'
-            >
+            <Box mb={4}>
               <Box
-                borderWidth={1}
-                p={4}
-                borderTopLeftRadius='2xl'
-                borderBottomLeftRadius='2xl'
+                key={race.round as React.Key}
+                borderRadius='2xl'
                 backgroundColor={
-                  index === nextRaceIndex ? "red.400" : "whatsapp.400"
+                  index === nextRaceIndex ? "white" : "transparent"
                 }
                 display='flex'
-                flexDir='column'
-                justifyContent='center'
-                alignItems='center'
+                flexDirection='row'
+                color={index === nextRaceIndex ? "black" : "whiteAlpha.600"}
               >
-                <Text fontSize='x-small' fontWeight={"semibold"}>
-                  Round
-                </Text>
-                <Text fontSize={"xl"}>{race.round}</Text>
+                <Box
+                  p={4}
+                  borderTopLeftRadius='2xl'
+                  borderBottomLeftRadius='2xl'
+                  backgroundColor={
+                    index === nextRaceIndex ? "red.400" : "transparent"
+                  }
+                  display='flex'
+                  flexDir='column'
+                  justifyContent='center'
+                  alignItems='center'
+                  color={index === nextRaceIndex ? "white" : ""}
+                >
+                  <Text fontSize='x-small' fontWeight={"semibold"}>
+                    Round
+                  </Text>
+                  <Text fontSize={"xl"}>{race.round}</Text>
+                </Box>
+                <Box flex={1} textAlign='right' p={4}>
+                  <Text>
+                    {getRaceTime(race.date, race.time)
+                      .local()
+                      .format("D MMM, hh:mm A")}
+                  </Text>
+                  <Text>{race.raceName}</Text>
+                </Box>
               </Box>
-              <Box flex={1} textAlign='right' p={4}>
-                <Text>
-                  {getRaceTime(race.date, race.time)
-                    .local()
-                    .format("D MMM, hh:mm A")}
-                </Text>
-                <Text>{race.raceName}</Text>
-              </Box>
+              {index !== schedule.Races.length - 1 &&
+                index !== nextRaceIndex && <Divider />}
             </Box>
           ))}
         </Box>
