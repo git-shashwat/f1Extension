@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "INLINE_RUNTIME_CHUNK=false react-scripts build",
+    "build": "INLINE_RUNTIME_CHUNK=false react-scripts build && tsc background.ts > build/background.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -46,6 +46,7 @@
     ]
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.210",
     "ts-loader": "^9.4.2",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1"
