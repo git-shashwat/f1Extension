@@ -15,6 +15,22 @@ const RaceCard = ({ race }: IRaceCard) => {
       display='flex'
       flexDirection='row'
       color='whiteAlpha.600'
+      cursor='pointer'
+      onClick={() => {
+        chrome.runtime.sendMessage("ajhjcmbbkmkbpjgkhdmlalbbohhfgjkn", {
+          type: "alarm",
+          round: race.round,
+          options: {
+            title: race.raceName,
+            message: `Race starts ${getRaceTime(
+              race.date,
+              race.time
+            ).fromNow()}`,
+            iconUrl: "/logo192.png",
+            type: "basic",
+          },
+        });
+      }}
     >
       <Box
         p={4}
