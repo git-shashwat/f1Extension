@@ -1,28 +1,38 @@
+const getRaceTime = (date: string, time: string) => {
+  return date + "T" + time;
+};
+
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Installed!");
 });
 
-chrome.runtime.onMessage.addListener((data) => {
+chrome.runtime.onMessage.addListener(async (data) => {
   if (data.type === "alarm") {
-    chrome.notifications.clear(data.round, (wasCleared) => {
-      if (wasCleared) {
-        //store round data in local storage for notification to pick up
-        chrome.storage.local.set({
-          [data.round]: data.options,
-        });
+    await chrome.storage.local.set(
+      Object.fromEntries(data.races.map((race, index) => [index, race]))
+    );
 
-        //set alarm
-        chrome.alarms.create(data.round, {
-          when: Date.now() + 3000,
-        });
-      }
+    data.races.forEach((race) => {
+      chrome.alarms.create(race.round, {
+        when:
+          new Date(getRaceTime(race.date, race.time)).valueOf() -
+          30 * 60 * 1000,
+      });
     });
+  } else if (data.type === "clear-alarm") {
+    await chrome.storage.local.clear();
+    await chrome.alarms.clearAll();
   }
 });
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
-  const notifications = await chrome.storage.local.get(alarm.name);
-  const round = notifications[Object.keys(notifications)[0]];
+  const notification = await chrome.storage.local.get(alarm.name);
+  const race = Object.values(notification)[0];
 
-  chrome.notifications.create(alarm.name, round);
+  chrome.notifications.create(alarm.name, {
+    type: "basic",
+    title: race.Circuit.circuitName,
+    message: `Race starts in 30 minutes.`,
+    iconUrl: "/F1.png",
+  });
 });

@@ -2,41 +2,32 @@ import React from "react";
 import { Box, Text } from "@chakra-ui/react";
 import { IRace } from "../../types/schedule.types";
 import { getRaceTime } from "../../utils";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 interface IRaceCard {
   race: IRace;
+  isNextRace: boolean;
 }
 
-const RaceCard = ({ race }: IRaceCard) => {
+const RaceCard = ({ race, isNextRace = false }: IRaceCard) => {
   return (
     <Box
       borderRadius='2xl'
-      backgroundColor='transparent'
+      backgroundColor={isNextRace ? "white" : "transparent"}
       display='flex'
       flexDirection='row'
-      color='whiteAlpha.600'
       cursor='pointer'
-      onClick={() => {
-        chrome.runtime.sendMessage("ajhjcmbbkmkbpjgkhdmlalbbohhfgjkn", {
-          type: "alarm",
-          round: race.round,
-          options: {
-            title: race.raceName,
-            message: `Race starts ${getRaceTime(
-              race.date,
-              race.time
-            ).fromNow()}`,
-            iconUrl: "/logo192.png",
-            type: "basic",
-          },
-        });
-      }}
+      color={isNextRace ? "black" : "whiteAlpha.600"}
     >
       <Box
         p={4}
         borderTopLeftRadius='2xl'
         borderBottomLeftRadius='2xl'
-        backgroundColor='transparent'
+        backgroundColor={isNextRace ? "red.400" : "transparent"}
+        color={isNextRace ? "white" : ""}
         display='flex'
         flexDir='column'
         justifyContent='center'

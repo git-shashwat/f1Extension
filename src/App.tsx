@@ -2,17 +2,23 @@ import React, { useCallback, useEffect, useState } from "react";
 import "./App.css";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { Box, Divider, Spinner, Text } from "@chakra-ui/react";
+import { Box, Divider, IconButton, Spinner, Text } from "@chakra-ui/react";
 import { ISchedule } from "./types/schedule.types";
 import { getRaceTime } from "./utils";
 import RaceCard from "./components/RaceCard/RaceCard";
-import NextRace from "./components/RaceCard/NextRace";
+import {
+  MdOutlineNotifications,
+  MdOutlineNotificationsOff,
+} from "react-icons/md";
 
 dayjs.extend(utc);
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [schedule, setSchedule] = useState<null | ISchedule>(null);
+  const [isNotificationsOn, setIsNotificationsOn] = useState(
+    !!Number(localStorage.getItem("f1NotificationFlag"))
+  );
   const nextRaceIndex = schedule?.Races.findIndex((race) =>
     getRaceTime(race.date, race.time).isAfter(dayjs())
   );
@@ -31,9 +37,33 @@ function App() {
     }
   }, []);
 
+  const handleNotificationToggle = useCallback(async () => {
+    if (schedule) {
+      const notificationFlag = localStorage.getItem("f1NotificationFlag");
+      if (!Number(notificationFlag)) {
+        setIsNotificationsOn(true);
+        localStorage.setItem("f1NotificationFlag", "1");
+        chrome.runtime.sendMessage(process.env.CHROME_EXTENSION_ID, {
+          type: "alarm",
+          races: schedule.Races,
+        });
+      } else {
+        setIsNotificationsOn(false);
+        localStorage.setItem("f1NotificationFlag", "0");
+        chrome.runtime.sendMessage(process.env.CHROME_EXTENSION_ID, {
+          type: "clear-alarm",
+        });
+      }
+    }
+  }, [schedule]);
+
   useEffect(() => {
     fetchSchedule();
   }, [fetchSchedule]);
+
+  useEffect(() => {
+    handleNotificationToggle();
+  }, [handleNotificationToggle]);
 
   return (
     <Box
@@ -48,22 +78,50 @@ function App() {
       {isLoading && <Spinner color='red.500' />}
       {schedule && (
         <Box w={"full"}>
-          <Text
-            fontSize='2xl'
-            fontWeight='semibold'
-            color='white'
-            letterSpacing='wide'
-            marginBottom='4'
+          <Box
+            display='flex'
+            flexDir='row'
+            justifyContent='space-between'
+            mb='8'
           >
-            {schedule.season} Season
-          </Text>
+            <Text
+              fontSize='2xl'
+              fontWeight='semibold'
+              color='white'
+              letterSpacing='wide'
+              marginBottom='4'
+            >
+              <span
+                style={{
+                  display: "inline",
+                  color: "red",
+                }}
+              >
+                {schedule.season}
+              </span>{" "}
+              Season
+            </Text>
+            <Box display='flex' flexDir='column' alignItems='flex-end'>
+              <IconButton
+                aria-label='notification'
+                icon={
+                  isNotificationsOn ? (
+                    <MdOutlineNotificationsOff />
+                  ) : (
+                    <MdOutlineNotifications />
+                  )
+                }
+                borderRadius='full'
+                onClick={handleNotificationToggle}
+              />
+              <Text textColor='whiteAlpha.600' fontSize='xs' mt='2'>
+                Turn {isNotificationsOn ? "off" : "on"} notifications
+              </Text>
+            </Box>
+          </Box>
           {schedule.Races.map((race, index) => (
             <Box mb={4} key={index}>
-              {index === nextRaceIndex ? (
-                <NextRace race={race} />
-              ) : (
-                <RaceCard race={race} />
-              )}
+              <RaceCard race={race} isNextRace={index === nextRaceIndex} />
               {index !== schedule.Races.length - 1 &&
                 index !== nextRaceIndex && <Divider />}
             </Box>
