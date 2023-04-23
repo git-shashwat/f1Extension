@@ -13,43 +13,44 @@ import {
 
 dayjs.extend(utc);
 
+function saveStateToStorage(state: any) {
+  chrome.storage.sync.set({ myExtensionState: state });
+}
+
+const getStorageData = (key: string) =>
+  new Promise((resolve, reject) =>
+    chrome.storage.sync.get(key, (result) =>
+      chrome.runtime.lastError ? resolve({}) : resolve(result)
+    )
+  );
+
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [schedule, setSchedule] = useState<null | ISchedule>(null);
-  const [isNotificationsOn, setIsNotificationsOn] = useState(
-    !!Number(localStorage.getItem("f1NotificationFlag"))
-  );
   const nextRaceIndex = schedule?.Races.findIndex((race) =>
     getRaceTime(race.date, race.time).isAfter(dayjs())
   );
-
-  const fetchSchedule = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("http://ergast.com/api/f1/2023.json");
-      const data = await response.json();
-
-      setSchedule(data.MRData.RaceTable);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const [f1NotificationFlag, setF1NotificationFlag] = useState(false);
 
   const handleNotificationToggle = useCallback(async () => {
     if (schedule) {
-      const notificationFlag = localStorage.getItem("f1NotificationFlag");
-      if (!Number(notificationFlag)) {
-        setIsNotificationsOn(true);
-        localStorage.setItem("f1NotificationFlag", "1");
+      const state = (await getStorageData("myExtensionState")) as any;
+      const f1NotificationFlag = state.myExtensionState?.f1NotificationFlag;
+
+      if (!Number(f1NotificationFlag)) {
+        saveStateToStorage({
+          f1NotificationFlag: "1",
+        });
+        setF1NotificationFlag(true);
         chrome.runtime.sendMessage(process.env.CHROME_EXTENSION_ID, {
           type: "alarm",
           races: schedule.Races,
         });
       } else {
-        setIsNotificationsOn(false);
-        localStorage.setItem("f1NotificationFlag", "0");
+        saveStateToStorage({
+          f1NotificationFlag: "0",
+        });
+        setF1NotificationFlag(false);
         chrome.runtime.sendMessage(process.env.CHROME_EXTENSION_ID, {
           type: "clear-alarm",
         });
@@ -58,12 +59,40 @@ function App() {
   }, [schedule]);
 
   useEffect(() => {
+    const fetchSchedule = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch("http://ergast.com/api/f1/2023.json");
+        const data = await response.json();
+
+        setSchedule(data.MRData.RaceTable);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchSchedule();
-  }, [fetchSchedule]);
+  }, []);
 
   useEffect(() => {
-    handleNotificationToggle();
-  }, [handleNotificationToggle]);
+    const setInitialState = async () => {
+      try {
+        const state = (await getStorageData("myExtensionState")) as any;
+
+        if (Object.keys(state).length > 0) {
+          setF1NotificationFlag(
+            !!Number(state.myExtensionState?.f1NotificationFlag)
+          );
+        }
+      } catch (err) {
+        alert(`Error: ${JSON.stringify(err)}`);
+      }
+    };
+
+    setInitialState();
+  }, []);
 
   return (
     <Box
@@ -74,6 +103,7 @@ function App() {
       alignItems='center'
       bgGradient='linear(to-br, gray.700, gray.900)'
       fontFamily='Montserrat, sans-serif'
+      height='full'
     >
       {isLoading && <Spinner color='red.500' />}
       {schedule && (
@@ -105,7 +135,7 @@ function App() {
               <IconButton
                 aria-label='notification'
                 icon={
-                  isNotificationsOn ? (
+                  f1NotificationFlag ? (
                     <MdOutlineNotificationsOff />
                   ) : (
                     <MdOutlineNotifications />
@@ -115,7 +145,7 @@ function App() {
                 onClick={handleNotificationToggle}
               />
               <Text textColor='whiteAlpha.600' fontSize='xs' mt='2'>
-                Turn {isNotificationsOn ? "off" : "on"} notifications
+                Turn {f1NotificationFlag ? "off" : "on"} notifications
               </Text>
             </Box>
           </Box>
