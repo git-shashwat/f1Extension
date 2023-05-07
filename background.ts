@@ -18,16 +18,22 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.runtime.onMessage.addListener(async (data) => {
   if (data.type === "alarm") {
     await chrome.storage.sync.set(
-      Object.fromEntries(data.races.map((race, index) => [index, race]))
+      Object.fromEntries(data.races.map((race) => [race.round, race]))
     );
 
-    data.races.forEach((race) => {
-      chrome.alarms.create(race.round, {
-        when:
-          new Date(getRaceTime(race.date, race.time)).valueOf() -
-          30 * 60 * 1000,
+    data.races
+      .filter(
+        (race) =>
+          new Date(getRaceTime(race.date, race.time)).valueOf() >
+          new Date().valueOf()
+      )
+      .forEach((race) => {
+        chrome.alarms.create(race.round, {
+          when:
+            new Date(getRaceTime(race.date, race.time)).valueOf() -
+            30 * 60 * 1000,
+        });
       });
-    });
   } else if (data.type === "clear-alarm") {
     await chrome.storage.sync.clear();
     await chrome.alarms.clearAll();

@@ -135,7 +135,7 @@ function App() {
               <IconButton
                 aria-label='notification'
                 icon={
-                  f1NotificationFlag ? (
+                  !f1NotificationFlag ? (
                     <MdOutlineNotificationsOff />
                   ) : (
                     <MdOutlineNotifications />
