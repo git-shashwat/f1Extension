@@ -24,11 +24,15 @@ export type IRace = {
     date: string;
     time: string;
   };
-  ThirdPractice: {
+  ThirdPractice?: {
     date: string;
     time: string;
   };
   Qualifying: {
+    date: string;
+    time: string;
+  };
+  Sprint?: {
     date: string;
     time: string;
   };

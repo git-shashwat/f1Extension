@@ -100,9 +100,12 @@ function App() {
       alignItems='center'
       bgGradient='linear(to-br, gray.700, gray.900)'
       fontFamily='Montserrat, sans-serif'
-      height='full'
     >
-      {isLoading && <Spinner color='red.500' />}
+      {isLoading && (
+        <div className='h-screen flex justify-center items-center'>
+          <Spinner color='red.500' />
+        </div>
+      )}
       {schedule && (
         <Box w={"full"}>
           <Header

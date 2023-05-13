@@ -48,6 +48,9 @@
   },
   "devDependencies": {
     "@types/chrome": "^0.0.210",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.23",
+    "tailwindcss": "^3.3.2",
     "ts-loader": "^9.4.2",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1"
