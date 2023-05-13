@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Box, Text } from "@chakra-ui/react";
 import { IRace } from "../../types/schedule.types";
 import { getRaceTime } from "../../utils";
@@ -13,8 +13,20 @@ interface IRaceCard {
 }
 
 const RaceCard = ({ race, isNextRace = false }: IRaceCard) => {
+  const nextRaceCardRef = useRef<null | HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (nextRaceCardRef.current) {
+      nextRaceCardRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, []);
+
   return (
     <Box
+      ref={isNextRace ? nextRaceCardRef : null}
       borderRadius='2xl'
       backgroundColor={isNextRace ? "white" : "transparent"}
       display='flex'

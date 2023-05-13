@@ -2,14 +2,11 @@ import React, { useCallback, useEffect, useState } from "react";
 import "./App.css";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { Box, Divider, IconButton, Spinner, Text } from "@chakra-ui/react";
+import { Box, Divider, Spinner } from "@chakra-ui/react";
 import { ISchedule } from "./types/schedule.types";
 import { getRaceTime } from "./utils";
 import RaceCard from "./components/RaceCard/RaceCard";
-import {
-  MdOutlineNotifications,
-  MdOutlineNotificationsOff,
-} from "react-icons/md";
+import Header from "./components/Header/Header";
 
 dayjs.extend(utc);
 
@@ -108,54 +105,20 @@ function App() {
       {isLoading && <Spinner color='red.500' />}
       {schedule && (
         <Box w={"full"}>
-          <Box
-            display='flex'
-            flexDir='row'
-            justifyContent='space-between'
-            mb='8'
-          >
-            <Text
-              fontSize='2xl'
-              fontWeight='semibold'
-              color='white'
-              letterSpacing='wide'
-              marginBottom='4'
-            >
-              <span
-                style={{
-                  display: "inline",
-                  color: "red",
-                }}
-              >
-                {schedule.season}
-              </span>{" "}
-              Season
-            </Text>
-            <Box display='flex' flexDir='column' alignItems='flex-end'>
-              <IconButton
-                aria-label='notification'
-                icon={
-                  !f1NotificationFlag ? (
-                    <MdOutlineNotificationsOff />
-                  ) : (
-                    <MdOutlineNotifications />
-                  )
-                }
-                borderRadius='full'
-                onClick={handleNotificationToggle}
-              />
-              <Text textColor='whiteAlpha.600' fontSize='xs' mt='2'>
-                Turn {f1NotificationFlag ? "off" : "on"} notifications
-              </Text>
-            </Box>
+          <Header
+            schedule={schedule}
+            f1NotificationFlag={f1NotificationFlag}
+            handleNotificationToggle={handleNotificationToggle}
+          />
+          <Box mt='16'>
+            {schedule.Races.map((race, index) => (
+              <Box mb={4} key={index}>
+                <RaceCard race={race} isNextRace={index === nextRaceIndex} />
+                {index !== schedule.Races.length - 1 &&
+                  index !== nextRaceIndex && <Divider />}
+              </Box>
+            ))}
           </Box>
-          {schedule.Races.map((race, index) => (
-            <Box mb={4} key={index}>
-              <RaceCard race={race} isNextRace={index === nextRaceIndex} />
-              {index !== schedule.Races.length - 1 &&
-                index !== nextRaceIndex && <Divider />}
-            </Box>
-          ))}
         </Box>
       )}
     </Box>
