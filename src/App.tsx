@@ -7,6 +7,7 @@ import { ISchedule } from "./types/schedule.types";
 import { getRaceTime } from "./utils";
 import RaceCard from "./components/RaceCard/RaceCard";
 import Header from "./components/Header/Header";
+import { io } from "socket.io-client";
 
 dayjs.extend(utc);
 
@@ -20,6 +21,37 @@ const getStorageData = (key: string) =>
       chrome.runtime.lastError ? resolve({}) : resolve(result)
     )
   );
+
+async function connectwss(token: string, cookie: string) {
+  const hub = encodeURIComponent(JSON.stringify([{ name: "Streaming" }]));
+  const encodedToken = encodeURIComponent(token);
+  const url = "wss://livetiming.formula1.com";
+  const p = new Promise((res, rej) => {
+    const sock = io(url, {
+      extraHeaders: {
+        Cookie: cookie,
+        "User-Agent": "BestHTTP",
+        "Accept-Encoding": "gzip,identity",
+      },
+      query: {
+        clientProtocol: "1.5",
+        transport: "webSockets",
+        connectionToken: encodedToken,
+        connectionData: hub,
+      },
+      // transports: ["webSockets"],
+      path: "/signalr/connect",
+    });
+
+    sock.on("open", (ev: any) => {
+      res(sock);
+    });
+    sock.on("message", (data) => {
+      console.log("received %s", data);
+    });
+  });
+  return p;
+}
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +102,32 @@ function App() {
       }
     };
 
+    const fetchNegotiation = async () => {
+      try {
+        const response = await fetch(
+          "https://foam-wooden-calendula.glitch.me/negotiate"
+        );
+        const data = await response.json();
+        const sock = (await connectwss(
+          data.data["ConnectionToken"],
+          data.headers["set-cookie"]
+        )) as any;
+
+        sock.send(
+          JSON.stringify({
+            H: "Streaming",
+            M: "Subscribe",
+            A: [["DriverList"]],
+            I: 1,
+          })
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     fetchSchedule();
+    fetchNegotiation();
   }, []);
 
   useEffect(() => {
