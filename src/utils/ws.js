@@ -1,7 +1,7 @@
-const axios = require("axios");
-const ws = require("ws");
+import axios from 'axios';
+import ws from 'ws'
 
-async function connectwss(token, cookie) {
+export async function connectwss(token, cookie) {
   const hub = encodeURIComponent(JSON.stringify([{ name: "Streaming" }]));
   console.log({ hub });
   const encodedToken = encodeURIComponent(token);
@@ -33,7 +33,7 @@ async function negotiate() {
   return resp;
 }
 
-async function main() {
+export async function main() {
   try {
     const resp = await negotiate();
     console.log(resp.data);
