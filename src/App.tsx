@@ -59,7 +59,7 @@ function App() {
     const fetchSchedule = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("http://ergast.com/api/f1/2023.json");
+        const response = await fetch("https://ergast.com/api/f1/current.json");
         const data = await response.json() as any;
 
         setSchedule(data.MRData.RaceTable);
@@ -70,19 +70,7 @@ function App() {
       }
     };
 
-    const fetchRaceData = async () => {
-      try {
-        const response = await fetch("https://abundant-harvest-calculator.glitch.me/socket");
-        const data = await response.json() as any;
-
-        console.log(data)
-      } catch (err) {
-        console.log("WS Error", err)
-      }
-    }
-
     fetchSchedule();
-    fetchRaceData();
   }, []);
 
   useEffect(() => {
