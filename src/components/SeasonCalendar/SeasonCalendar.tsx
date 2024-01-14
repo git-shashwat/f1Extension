@@ -110,7 +110,7 @@ function SeasonCalendar() {
           <Box>
             {schedule.Races.map((race, index) => (
               <Box mb={4} key={index}>
-                <RaceCard race={race} isNextRace={index === 1} />
+                <RaceCard race={race} isNextRace={index === nextRaceIndex} />
                 {index !== schedule.Races.length - 1 &&
                   index !== nextRaceIndex && <Divider />}
               </Box>
