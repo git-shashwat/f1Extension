@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Box, Text, Tooltip } from "@chakra-ui/react";
 import { IRace } from "../../types/schedule.types";
 import { getRaceTime } from "../../utils";
@@ -42,14 +42,14 @@ const RaceCard = ({ race, isNextRace = false }: IRaceCard) => {
         ref={isNextRace ? nextRaceCardRef : null}
         backgroundColor={isNextRace ? "white" : "transparent"}
         color={isNextRace ? "black" : "whiteAlpha.600"}
-        className='w-full flex flex-row !rounded-2xl hover:scale-105 transition-all mb-3'
+        className='m-1.5 flex flex-row !rounded-2xl hover:scale-105 transition-all mb-3'
       >
         <Box
           p={4}
           borderTopLeftRadius='2xl'
           borderBottomLeftRadius='2xl'
-          backgroundColor={isNextRace ? "red.400" : "transparent"}
-          color={isNextRace ? "white" : ""}
+          backgroundColor={isNextRace ? "#D01110" : "transparent"}
+          color={isNextRace ? "#EBE8E0" : ""}
           display='flex'
           flexDir='column'
           justifyContent='center'

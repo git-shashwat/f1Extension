@@ -9,7 +9,22 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        oswald: ["Oswald", "sans-serif"],
+      },
+      colors: {
+        brand: {
+          white: '#EBE8E0',
+          olive: '#A8BBB0',
+          red: '#D01110',
+          black: '#0A0A00',
+          blue: '#004080',
+          gray: '#606060',
+          yellow: '#FFD100',
+        }
+      }
+    },
   },
   plugins: [],
 };

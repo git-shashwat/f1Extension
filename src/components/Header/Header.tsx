@@ -19,30 +19,29 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <Box
-      position='fixed'
+      position='sticky'
       display='flex'
       flexDir='row'
       alignItems='center'
       justifyContent='space-between'
-      mb='8'
-      backgroundColor='black'
-      top={0}
+      backgroundColor='#0A0A00'
+      top={10}
       left={0}
-      width='100%'
       zIndex={1}
       padding='2'
+      className="border-b-2 border-[#A8BBB0]"
     >
       <Text
         fontSize='2xl'
         fontWeight='semibold'
-        color='white'
+        color='#EBE8E0'
         letterSpacing='wide'
         marginBottom='4'
       >
         <span
           style={{
             display: "inline",
-            color: "red",
+            color: "#A8BBB0",
           }}
         >
           {schedule.season}
@@ -62,7 +61,7 @@ const Header: React.FC<HeaderProps> = ({
           borderRadius='full'
           onClick={handleNotificationToggle}
         />
-        <Text textColor='whiteAlpha.600' fontSize='xs' mt='2'>
+        <Text textColor='#EBE8E0' fontSize='xs' mt='2'>
           Turn {f1NotificationFlag ? "off" : "on"} notifications
         </Text>
       </Box>
