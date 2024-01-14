@@ -1,7 +1,7 @@
 {
   "name": "F1 Extension",
-  "description": "F1 Schedule 2024 Chrome Extension, the ultimate tool for all Formula 1 enthusiasts!",
-  "version": "1.1.2",
+  "description": "F1 Extension, the ultimate tool for all Formula 1 enthusiasts!",
+  "version": "1.2.0",
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html",
